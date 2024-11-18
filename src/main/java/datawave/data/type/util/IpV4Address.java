@@ -10,24 +10,39 @@ import com.google.common.collect.Iterables;
  */
 public class IpV4Address extends IpAddress {
     private static final long serialVersionUID = -3258500702340145500L;
-    private byte[] ipaddress = new byte[4];
+    private byte[] ipaddress;
     private int wildcardLoc = -1;
     private int numOctets = 4;
     
     public IpV4Address(byte[] address) {
-        if (address.length != 4) {
-            throw new IllegalArgumentException("An IPV4 address must be 4 bytes in length");
-        }
-        System.arraycopy(address, 0, this.ipaddress, 0, 4);
+        this(address, -1, 4);
     }
     
     public IpV4Address(byte[] address, int wildcardLoc, int numOctets) {
+        this(address, wildcardLoc, numOctets, true);
+    }
+    
+    public IpV4Address(byte[] address, int wildcardLoc, int numOctets, boolean copyAddress) {
         this.wildcardLoc = wildcardLoc;
         this.numOctets = numOctets;
         if (address.length != 4) {
             throw new IllegalArgumentException("An IPV4 address must be 4 bytes in length");
         }
-        System.arraycopy(address, 0, this.ipaddress, 0, 4);
+        if (copyAddress) {
+            this.ipaddress = new byte[4];
+            System.arraycopy(address, 0, this.ipaddress, 0, 4);
+        }
+        {
+            this.ipaddress = address;
+        }
+    }
+    
+    public int getWildcardLoc() {
+        return wildcardLoc;
+    }
+    
+    public int getNumOctets() {
+        return numOctets;
     }
     
     public IpV4Address(long ipaddress) {
@@ -38,6 +53,10 @@ public class IpV4Address extends IpAddress {
         this.ipaddress[2] = (byte) (0x00FF & (ipaddress >>> 8));
         this.ipaddress[1] = (byte) (0x00FF & (ipaddress >>> 16));
         this.ipaddress[0] = (byte) (0x00FF & (ipaddress >>> 24));
+    }
+    
+    public byte[] getAddress() {
+        return ipaddress;
     }
     
     /**

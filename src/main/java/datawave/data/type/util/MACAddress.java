@@ -50,6 +50,18 @@ public class MACAddress implements Serializable, Comparable<MACAddress> {
         this.groupings = MAC_ADDRESS_LENGTH / this.groupingSize;
     }
     
+    public String getMacAddress() {
+        return macAddress;
+    }
+    
+    public String getSeparator() {
+        return separator;
+    }
+    
+    public int getGroupingSize() {
+        return groupingSize;
+    }
+    
     /**
      * Normalize the string representation of the MAC address. Defaults to using a grouping size of 2
      * 

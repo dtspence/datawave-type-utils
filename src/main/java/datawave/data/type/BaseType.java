@@ -1,11 +1,15 @@
 package datawave.data.type;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.Serializer;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
+import datawave.data.normalizer.Normalizer;
+import datawave.webservice.query.data.ObjectSizeOf;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
-
-import datawave.data.normalizer.Normalizer;
-import datawave.webservice.query.data.ObjectSizeOf;
 
 public class BaseType<T extends Comparable<T> & Serializable> implements Serializable, Type<T>, ObjectSizeOf {
     
@@ -36,6 +40,11 @@ public class BaseType<T extends Comparable<T> & Serializable> implements Seriali
     public void setDelegate(T delegate) {
         this.delegate = delegate;
         normalizeAndSetNormalizedValue(this.delegate);
+    }
+    
+    void setDelegateAndNormalizedValue(T delegate, String normalizedValue) {
+        this.delegate = delegate;
+        setNormalizedValue(normalizedValue);
     }
     
     public String getNormalizedValue() {
@@ -167,4 +176,20 @@ public class BaseType<T extends Comparable<T> & Serializable> implements Seriali
         size += STATIC_SIZE + (2 * normalizedValue.length()) + ObjectSizeOf.Sizer.getObjectSize(delegate);
         return size;
     }
+    
+    Normalizer<T> getNormalizer() {
+        return normalizer;
+    }
+    
+    protected void readMetadata(Kryo kryo, Input input, Serializer<T> delegateSerializer, Class<T> delegateType) {
+        delegateSerializer.read(kryo, input, delegateType);
+        normalizedValue = input.readString();
+    }
+    
+    protected void writeMetadata(Kryo kryo, Output output, Serializer<T> delegateSerializer) {
+        delegateSerializer.write(kryo, output, delegate);
+        output.writeString(normalizedValue);
+        output.writeString(normalizer.getClass().getName());
+    }
+    
 }

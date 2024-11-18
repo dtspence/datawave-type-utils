@@ -10,13 +10,26 @@ import org.apache.commons.lang.StringUtils;
  */
 public class IpV6Address extends IpAddress {
     private static final long serialVersionUID = -1528748156190096213L;
-    private short[] ipaddress = new short[8];
+    private short[] ipaddress;
     
     public IpV6Address(short[] address) {
+        this(address, true);
+    }
+    
+    public IpV6Address(short[] address, boolean copyAddress) {
         if (address.length != 8) {
             throw new IllegalArgumentException("An IpV6 address must be 8 shorts in length");
         }
-        System.arraycopy(address, 0, this.ipaddress, 0, address.length);
+        if (copyAddress) {
+            this.ipaddress = new short[8];
+            System.arraycopy(address, 0, this.ipaddress, 0, address.length);
+        } else {
+            this.ipaddress = address;
+        }
+    }
+    
+    public short[] getAddress() {
+        return ipaddress;
     }
     
     /**
